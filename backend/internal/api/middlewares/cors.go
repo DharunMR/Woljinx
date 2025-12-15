@@ -5,18 +5,28 @@ import "net/http"
 var allowedOrigins = []string{
 	"https://my-origin-url.com",
 	"https://www.myfrontend.com",
-	"https://localhost:3000",
+	"https://localhost:8080",
+	"http://localhost:8080",
 }
 
 func Cors(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
 
-		if isOriginAllowed(origin) {
-			w.Header().Set("Access-Control-Allow-Origin", origin)
-		} else {
-			http.Error(w, "Not allowed by Cors", http.StatusForbidden)
-			return
+		// if isOriginAllowed(origin) {
+		// 	w.Header().Set("Access-Control-Allow-Origin", origin)
+		// } else {
+		// 	http.Error(w, "Not allowed by Cors", http.StatusForbidden)
+		// 	return
+		// }
+
+		if origin != "" {
+			if isOriginAllowed(origin) {
+				w.Header().Set("Access-Control-Allow-Origin", origin)
+			} else {
+				http.Error(w, "Not allowed by CORS", http.StatusForbidden)
+				return
+			}
 		}
 
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")

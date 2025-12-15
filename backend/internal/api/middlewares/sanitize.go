@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"backend/pkg/utils"
 	"bytes"
 	"encoding/json"
 	"fmt"
