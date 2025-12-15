@@ -1,55 +1,33 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
-	"embed"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	mw "backend/internal/api/middlewares"
 	"backend/internal/api/router"
+	"backend/internal/repository/database"
+	"backend/pkg/utils"
 
 	"github.com/joho/godotenv"
 )
 
-var envFile embed.FS
+func main() {
 
-func loadEnvFromEmbeddedFile() {
-	content, err := envFile.ReadFile(".env")
-	if err != nil {
-		log.Fatalf("Error reading .env file: %v", err)
-	}
-
-	tempfile, err := os.CreateTemp("", ".env")
-	if err != nil {
-		log.Fatalf("Error creating temp .env file: %v", err)
-	}
-	defer os.Remove(tempfile.Name())
-
-	_, err = tempfile.Write(content)
-	if err != nil {
-		log.Fatalf("Error writing to temp .env file: %v", err)
-	}
-
-	err = tempfile.Close()
-	if err != nil {
-		log.Fatalf("Error closing temp file: %v", err)
-	}
-
-	err = godotenv.Load(tempfile.Name())
+	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
-}
-
-func main() {
 
 	port := os.Getenv("API_PORT")
 
-	cert := os.Getenv("CERT_FILE")
-	key := os.Getenv("KEY_FILE")
+	// cert := os.Getenv("CERT_FILE")
+	// key := os.Getenv("KEY_FILE")
 
 	tlsConfig := &tls.Config{
 		MinVersion: tls.VersionTLS12,
@@ -62,9 +40,19 @@ func main() {
 		Whitelist:                   []string{"sortBy", "sortOrder", "name", "age", "class"},
 	}
 
-	router := router.MainRouter()
-	jwtMiddleware := mw.MiddlewaresExcludePaths(mw.JWTMiddleware, "/execs/login", "/execs/forgotpassword", "/execs/resetpassword/reset")
-	secureMux := utils.ApplyMiddlewares(router, mw.SecurityHeaders, mw.Compression, mw.Hpp(hppOptions), mw.XSSMiddleware, jwtMiddleware, mw.ResponseTimeMiddleware, mw.Cors)
+	Ratelimiter := mw.NewRateLimiter(10, 30*time.Second)
+
+	client := database.Connect()
+	defer func() {
+		err := client.Disconnect(context.Background())
+		if err != nil {
+			log.Fatalf("Failed to disconnect from MongoDB: %v", err)
+		}
+	}()
+
+	router := router.MainRouter(client)
+	jwtMiddleware := mw.MiddlewaresExcludePaths(mw.JWTMiddleware, "/movies", "/register", "/login", "/logout", "/genres", "/refresh")
+	secureMux := utils.ApplyMiddlewares(router, jwtMiddleware, Ratelimiter.Middleware, mw.SecurityHeaders, mw.Compression, mw.Hpp(hppOptions), mw.XSSMiddleware, mw.ResponseTimeMiddleware, mw.Cors)
 
 	server := &http.Server{
 		Addr:      port,
@@ -76,7 +64,7 @@ func main() {
 
 	fmt.Println("Server is running on port: " + port)
 
-	err := server.ListenAndServeTLS(cert, key)
+	err = server.ListenAndServe()
 	if err != nil {
 		log.Fatalln("Error starting the server", err)
 	}
