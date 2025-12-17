@@ -7,6 +7,7 @@ var allowedOrigins = []string{
 	"https://www.myfrontend.com",
 	"https://localhost:8080",
 	"http://localhost:8080",
+	"http://localhost:5173",
 }
 
 func Cors(next http.Handler) http.Handler {
@@ -37,6 +38,7 @@ func Cors(next http.Handler) http.Handler {
 
 		// Handle preflight request
 		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
 			return
 		}
 

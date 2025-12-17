@@ -43,6 +43,9 @@ func main() {
 	Ratelimiter := mw.NewRateLimiter(10, 30*time.Second)
 
 	client := database.Connect()
+	if err := client.Ping(context.Background(), nil); err != nil {
+		log.Fatalf("Failed to reach server: %v", err)
+	}
 	defer func() {
 		err := client.Disconnect(context.Background())
 		if err != nil {

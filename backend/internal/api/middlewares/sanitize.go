@@ -15,18 +15,14 @@ import (
 )
 
 func XSSMiddleware(next http.Handler) http.Handler {
-	fmt.Println("****** Intializing XSSMiddleware")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("++++++++++++ XSSMiddleware Ran")
 
-		// Sanitize the URL Path
 		sanitizedPath, err := clean(r.URL.Path)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		// Sanitize query params
 		params := r.URL.Query()
 		sanitizedQuery := make(map[string][]string)
 		for key, values := range params {
@@ -51,7 +47,6 @@ func XSSMiddleware(next http.Handler) http.Handler {
 		r.URL.Path = sanitizedPath.(string)
 		r.URL.RawQuery = url.Values(sanitizedQuery).Encode()
 
-		// Sanitize request body
 		if r.Header.Get("Content-Type") == "application/json" {
 			if r.Body != nil {
 				bodyBytes, err := io.ReadAll(r.Body)
@@ -62,7 +57,6 @@ func XSSMiddleware(next http.Handler) http.Handler {
 
 				bodyString := strings.TrimSpace(string(bodyBytes))
 
-				// Reset the request body
 				r.Body = io.NopCloser(bytes.NewReader([]byte(bodyString)))
 
 				if len(bodyString) > 0 {
@@ -73,14 +67,12 @@ func XSSMiddleware(next http.Handler) http.Handler {
 						return
 					}
 
-					// Sanitize the JSON body
 					sanitizedData, err := clean(inputData)
 					if err != nil {
 						http.Error(w, err.Error(), http.StatusBadRequest)
 						return
 					}
 
-					// Marshal the sanitized data back to the body
 					sanitizedBody, err := json.Marshal(sanitizedData)
 					if err != nil {
 						http.Error(w, utils.ErrorHandler(err, "Error sanitizing body").Error(), http.StatusBadRequest)
@@ -102,11 +94,9 @@ func XSSMiddleware(next http.Handler) http.Handler {
 		}
 
 		next.ServeHTTP(w, r)
-		fmt.Println("Sending response from XSSMiddleware Ran")
 	})
 }
 
-// Clean sanitizes input data to prevent XSS attacks
 func clean(data interface{}) (interface{}, error) {
 
 	switch v := data.(type) {
@@ -142,7 +132,7 @@ func sanitizeValue(data interface{}) interface{} {
 		}
 		return v
 	default:
-		return v // Return v as it is unsupported
+		return v
 	}
 }
 

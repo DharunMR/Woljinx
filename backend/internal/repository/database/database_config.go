@@ -37,6 +37,10 @@ func OpenCollection(collectionName string, client *mongo.Client) *mongo.Collecti
 	if collection == nil {
 		return nil
 	}
+
+	log.Println("Using database:", databaseName)
+	log.Println("Using collection:", collection)
+
 	return collection
 
 }
