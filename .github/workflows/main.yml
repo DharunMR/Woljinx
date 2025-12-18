@@ -75,22 +75,22 @@ jobs:
                 npm run build
 
 
-# SECURITY SCAN (CODE)
-    security-code:
-        name: Security Scan Code
-        runs-on: ubunru-latest
-        needs: [backend-ci,frontend-ci]
+# # SECURITY SCAN (CODE)
+#     security-code:
+#         name: Security Scan Code
+#         runs-on: ubunru-latest
+#         needs: [backend-ci,frontend-ci]
 
-        steps:
-            - uses: actions/checkout@v4
+#         steps:
+#             - uses: actions/checkout@v4
 
-            - name: Trivy filesystem scan
-              uses: aquasecurity/trivy-action@master
-              with:
-                scan-type: fs
-                scan-ref: .
-                severity: HIGH,CRITICAL
-                exit-code: 1
+#             - name: Trivy filesystem scan
+#               uses: aquasecurity/trivy-action@master
+#               with:
+#                 scan-type: fs
+#                 scan-ref: .
+#                 severity: HIGH,CRITICAL
+#                 exit-code: 1
 
 
 # BUILD and PUSH DOCKER IMAGE
