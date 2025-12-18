@@ -32,6 +32,7 @@ jobs:
 
             - name: Run unit tests
               run: |
+                cd backend/server
                 go test ./backend/.. -race -coverprofile=cover.out
 
             - name: Upload coverage
