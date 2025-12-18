@@ -10,7 +10,7 @@ RUN go mod download
 #Copy remaining files
 COPY . .
 
-RUN CGO-ENABLED=0 GOOS=linux GOARCH=amd64 \
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     go build -o app ./server
 
 

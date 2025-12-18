@@ -75,7 +75,7 @@ jobs:
                 npm run build
 
 
-# # # SECURITY SCAN (CODE)
+# # SECURITY SCAN (CODE)
 #     security-code:
 #         name: Security Scan Code
 #         runs-on: ubunru-latest
