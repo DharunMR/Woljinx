@@ -112,7 +112,7 @@ jobs:
             - name: Build and Push Backend
               run: |
                 docker build -t $IMAGE_BACKEND:${{ github.sha }} backend
-                docker tag $IMAGE_BACKEND:$${{ github.sha }} $IMAGE_BACKEND:latest
+                docker tag $IMAGE_BACKEND:${{ github.sha }} $IMAGE_BACKEND:latest
                 docker push $IMAGE_BACKEND:${{ github.sha }}
                 docker push $IMAGE_BACKEND:latest
                 
