@@ -75,7 +75,7 @@ jobs:
                 npm run build
 
 
-# # SECURITY SCAN (CODE)
+# # # SECURITY SCAN (CODE)
 #     security-code:
 #         name: Security Scan Code
 #         runs-on: ubunru-latest
@@ -97,7 +97,7 @@ jobs:
     docker-build:
         name: Build & Push Images
         runs-on: ubuntu-latest
-        needs: security-code
+        # needs: security-code
 
         steps:
             - uses: actions/checkout@v4
