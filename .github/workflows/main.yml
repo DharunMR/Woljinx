@@ -33,7 +33,7 @@ jobs:
             - name: Run unit tests
               run: |
                 cd backend/server
-                go test ./backend/.. -race -coverprofile=cover.out
+                go test . -race -coverprofile=cover.out
 
             - name: Upload coverage
               uses: actions/upload-artifact@v4
@@ -56,7 +56,7 @@ jobs:
               with:
                 node-version: ${{ env.NODE_VERSION}}
                 cache: npm
-                cache-dependency-path: frontend/package-loc.json
+                cache-dependency-path: frontend/package-lock.json
 
             - name: Install deps
               run: |
