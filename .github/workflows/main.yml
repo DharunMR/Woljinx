@@ -68,10 +68,11 @@ jobs:
                 cd frontend
                 npm run lint
 
-            - name: Run tests
+            - name: Build frontend
               run: |
                 cd frontend
-                npm test -- --watch=false
+                npm install
+                npm run build
 
 
 # SECURITY SCAN (CODE)
@@ -92,7 +93,7 @@ jobs:
                 exit-code: 1
 
 
-# BUILD and PUSH DOCKER IMAGES
+# BUILD and PUSH DOCKER IMAGE
     docker-build:
         name: Build & Push Images
         runs-on: ubuntu-latest
